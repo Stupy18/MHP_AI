@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import learning_curve
 import matplotlib.pyplot as plt
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 
@@ -80,19 +80,19 @@ train_std = np.std(train_scores, axis=1)
 test_mean = np.mean(test_scores, axis=1)
 test_std = np.std(test_scores, axis=1)
 
-# Plot learning curves
-plt.plot(train_sizes, train_mean, label="Training score", color="r")
-plt.plot(train_sizes, test_mean, label="Cross-validation score", color="g")
-
-# Plot the std deviation as a transparent range at each training set size
-plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, color="r", alpha=0.1)
-plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, color="g", alpha=0.1)
-
-# Draw plot
-plt.title("Learning Curve")
-plt.xlabel("Training Set Size"), plt.ylabel("Accuracy Score"), plt.legend(loc="best")
-plt.tight_layout()
-plt.show()
+# # Plot learning curves
+# plt.plot(train_sizes, train_mean, label="Training score", color="r")
+# plt.plot(train_sizes, test_mean, label="Cross-validation score", color="g")
+#
+# # Plot the std deviation as a transparent range at each training set size
+# plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, color="r", alpha=0.1)
+# plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, color="g", alpha=0.1)
+#
+# # Draw plot
+# plt.title("Learning Curve")
+# plt.xlabel("Training Set Size"), plt.ylabel("Accuracy Score"), plt.legend(loc="best")
+# plt.tight_layout()
+# plt.show()
 
 # Create a StratifiedKFold object
 stratified_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -110,6 +110,38 @@ train_f1 = f1_score(y_train_mr, y_train_pred, average='weighted')
 
 print(f"Training Accuracy: {train_accuracy}, Training F1 Score: {train_f1}")
 
+
+
+# Function to generate random data and time
+def generate_random_datetime():
+    # Generate random date within a reasonable range
+    random_date = datetime.now() + timedelta(days=random.randint(1, 30))
+    # Generate random time within working hours (9 AM to 5 PM)
+    random_time = random.randint(9, 16)
+    # Combine date and time
+    random_datetime = random_date.replace(hour=random_time, minute=0, second=0)
+    return random_datetime
+
+# Generate random data and time
+random_datetime = generate_random_datetime()
+
+# Prepare the data in the required format
+random_data = pd.DataFrame({'date': [random_datetime.date()],
+                            'day_of_week': [random_datetime.weekday()],
+                            'nineToEleven': [random.randint(0, 1)],
+                            'elevenToOne': [random.randint(0, 1)],
+                            'oneToThree': [random.randint(0, 1)],
+                            'threeToFive': [random.randint(0, 1)],
+                            'room': [random.choice(meeting_rooms_df['room'])]})
+
+
+random_data['capacity'] = random.randint(1, 100)  # Assuming capacity can vary from 1 to 100
+
+# Predict occupancy percentage
+occupancy_prediction = pipeline_meeting_rooms.predict(random_data)
+
+print("Randomly Generated Date and Time:", random_datetime)
+print("Predicted Occupancy Percentage:", occupancy_prediction[0] * 100, "%")
 
 
 
